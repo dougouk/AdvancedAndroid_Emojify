@@ -21,6 +21,9 @@ public class Emojify {
 
     private static int EMOJI_SCALE_FACTOR = 1;
 
+    private static double SMILING_THRESHOLD = 0.25;
+    private static double EYE_CLOSED_THRESHOLD = 0.5;
+
     public static Bitmap detectFacesAndOverlayEmoji(Bitmap bitmap, Context context){
         FaceDetector faceDetector = new FaceDetector.Builder(context)
                 .setTrackingEnabled(false)
@@ -34,11 +37,12 @@ public class Emojify {
         Bitmap resultBitmap = bitmap;
 
         Log.d(TAG, faces.size() + " faces");
+
         if(faces.size() == 0){
             Toast.makeText(context, "No faces detected", Toast.LENGTH_SHORT).show();
         }else{
             for(int i = 0; i < faces.size(); i++){
-                Face face = faces.get(i);
+                Face face = faces.valueAt(i);
                 if(face == null){
                     Log.w(TAG, "face is null");
                 }
@@ -95,28 +99,26 @@ public class Emojify {
         double rightEye = face.getIsRightEyeOpenProbability();
         double smiling = face.getIsSmilingProbability();
 
-        double thd = 0.5; //threshold
-
         Emoji emoji = null;
 
-        if(smiling > thd){
-            if(leftEye > thd && rightEye > thd )
+        if(smiling > SMILING_THRESHOLD){
+            if(leftEye > EYE_CLOSED_THRESHOLD && rightEye > EYE_CLOSED_THRESHOLD )
                 emoji = Emoji.OOS;
-            if(leftEye > thd && rightEye < thd )
+            if(leftEye > EYE_CLOSED_THRESHOLD && rightEye < EYE_CLOSED_THRESHOLD )
                 emoji = Emoji.OCS;
-            if(leftEye < thd && rightEye > thd )
+            if(leftEye < EYE_CLOSED_THRESHOLD && rightEye > EYE_CLOSED_THRESHOLD )
                 emoji = Emoji.COS;
-            if(leftEye < thd && rightEye < thd )
+            if(leftEye < EYE_CLOSED_THRESHOLD && rightEye < EYE_CLOSED_THRESHOLD )
                 emoji = Emoji.CCS;
         }
         else{
-            if(leftEye > thd && rightEye > thd )
+            if(leftEye > EYE_CLOSED_THRESHOLD && rightEye > EYE_CLOSED_THRESHOLD )
                 emoji = Emoji.OOF;
-            if(leftEye > thd && rightEye < thd )
+            if(leftEye > EYE_CLOSED_THRESHOLD && rightEye < EYE_CLOSED_THRESHOLD )
                 emoji = Emoji.OCF;
-            if(leftEye < thd && rightEye > thd )
+            if(leftEye < EYE_CLOSED_THRESHOLD && rightEye > EYE_CLOSED_THRESHOLD )
                 emoji = Emoji.COF;
-            if(leftEye < thd && rightEye < thd )
+            if(leftEye < EYE_CLOSED_THRESHOLD && rightEye < EYE_CLOSED_THRESHOLD )
                 emoji = Emoji.CCF;
         }
         Log.d(TAG, String.valueOf(emoji));
