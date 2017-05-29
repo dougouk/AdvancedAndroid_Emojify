@@ -24,7 +24,6 @@ public class Emojify {
     public static Bitmap detectFacesAndOverlayEmoji(Bitmap bitmap, Context context){
         FaceDetector faceDetector = new FaceDetector.Builder(context)
                 .setTrackingEnabled(false)
-                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .build();
 
@@ -39,9 +38,13 @@ public class Emojify {
             Toast.makeText(context, "No faces detected", Toast.LENGTH_SHORT).show();
         }else{
             for(int i = 0; i < faces.size(); i++){
+                Face face = faces.get(i);
+                if(face == null){
+                    Log.w(TAG, "face is null");
+                }
                 Bitmap emojiBitmap = null;
 
-                switch(whichEmoji(faces.get(i))){
+                switch(whichEmoji(face)){
                     case OOS:
                         emojiBitmap = BitmapFactory.decodeResource(context.getResources(),
                                 R.drawable.smile);
@@ -76,7 +79,7 @@ public class Emojify {
                         break;
                     default: break;
                 }
-                resultBitmap = addBitmapToFace(bitmap, emojiBitmap, faces.get(i));
+                resultBitmap = addBitmapToFace(bitmap, emojiBitmap, face);
             }
         }
 
